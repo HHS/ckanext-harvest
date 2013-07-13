@@ -339,7 +339,7 @@ class Harvester(CkanCommand):
             raise
         finally:
             job.finished = datetime.datetime.utcnow()
-            job.status = "Error"
+            if job.status != "Done": job.status = "Error"
             job.save()
 
     def print_harvest_sources(self, sources):
