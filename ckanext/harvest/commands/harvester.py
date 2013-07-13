@@ -97,8 +97,6 @@ class Harvester(CkanCommand):
         self.admin_user = get_action('get_site_user')(context,{})
 
 
-        print ''
-
         if len(self.args) == 0:
             self.parser.print_usage()
             sys.exit(1)
