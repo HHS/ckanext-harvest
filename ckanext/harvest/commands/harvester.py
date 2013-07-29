@@ -301,6 +301,9 @@ class Harvester(CkanCommand):
         from ckanext.harvest.interfaces import IHarvester
         from ckanext.harvest.model import HarvestSource, HarvestJob, HarvestObject
         from ckanext.harvest.queue import fetch_and_import_stages
+        from ckan.lib.search.index import PackageSearchIndex
+
+        package_index = PackageSearchIndex()
         
         source_id = unicode(self.args[1])
         source = HarvestSource.get(source_id)
@@ -332,6 +335,10 @@ class Harvester(CkanCommand):
             job.finished = datetime.datetime.utcnow()
             job.status = "Done"
             job.save()
+
+            # And reindex the harvest source so it gets its counts right.
+            # Must call update on a data_dict as returned by package_show, not the class object.
+            package_index.index_package(get_action('package_show')({'validate': False, 'ignore_auth': True}, {'id': source.id}))
         except (Exception, KeyboardInterrupt):
             model.Session.query(HarvestObject).filter_by(
                 harvest_job_id=job.id
