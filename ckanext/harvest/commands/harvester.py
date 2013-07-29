@@ -339,11 +339,6 @@ class Harvester(CkanCommand):
             # And reindex the harvest source so it gets its counts right.
             # Must call update on a data_dict as returned by package_show, not the class object.
             package_index.index_package(get_action('package_show')({'validate': False, 'ignore_auth': True}, {'id': source.id}))
-        except (Exception, KeyboardInterrupt):
-            model.Session.query(HarvestObject).filter_by(
-                harvest_job_id=job.id
-            ).delete()
-            raise
         finally:
             job.finished = datetime.datetime.utcnow()
             if job.status != "Done": job.status = "Error"
